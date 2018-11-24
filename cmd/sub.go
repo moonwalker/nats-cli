@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/nats-io/go-nats"
@@ -14,9 +15,10 @@ var subCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		topic := args[0]
 
-		nc, err := nats.Connect(nats.DefaultURL)
+		url := fmt.Sprintf("nats://%s:%d", host, port)
+		nc, err := nats.Connect(url)
 		if err != nil {
-			log.Printf("Failed to connect to: %s\n", nats.DefaultURL)
+			log.Printf("Failed to connect to: %s\n", url)
 			return
 		}
 

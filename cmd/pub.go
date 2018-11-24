@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/nats-io/go-nats"
@@ -15,9 +16,10 @@ var pubCmd = &cobra.Command{
 		topic := args[0]
 		message := []byte(args[1])
 
-		nc, err := nats.Connect(nats.DefaultURL)
+		url := fmt.Sprintf("nats://%s:%d", host, port)
+		nc, err := nats.Connect(url)
 		if err != nil {
-			log.Printf("Failed to connect to: %s\n", nats.DefaultURL)
+			log.Printf("Failed to connect to: %s\n", url)
 			return
 		}
 
