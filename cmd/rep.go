@@ -8,12 +8,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var subCmd = &cobra.Command{
-	Use:   "sub",
-	Short: "subscribe <topic>",
-	Args:  cobra.ExactArgs(1),
+var repCmd = &cobra.Command{
+	Use:   "rep",
+	Short: "reply <topic> <message>",
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		topic := args[0]
+		message := []byte(args[1])
 
 		url := fmt.Sprintf("nats://%s:%d", host, port)
 		nc, err := nats.Connect(url)
@@ -23,19 +24,24 @@ var subCmd = &cobra.Command{
 		}
 
 		_, err = nc.Subscribe(topic, func(msg *nats.Msg) {
-			log.Printf("Received a message to topic: %s\n", msg.Subject)
-			log.Printf("Message: %s\n", string(msg.Data))
+			if len(msg.Reply) > 0 {
+				log.Printf("Received a request on topic: %s\n", msg.Subject)
+				log.Printf("Request: %s\n", string(msg.Data))
+				log.Printf("Reply: %s\n", string(message))
+				nc.Publish(msg.Reply, message)
+			}
 		})
+
 		if err != nil {
 			log.Printf("Failed to subscribe to: %s\n", topic)
 			return
 		}
 
-		log.Printf("Listening for messages on: %s\n", topic)
+		log.Printf("Listening for requests on: %s\n", topic)
 		select {}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(subCmd)
+	rootCmd.AddCommand(repCmd)
 }

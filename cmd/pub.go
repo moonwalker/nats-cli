@@ -23,15 +23,19 @@ var pubCmd = &cobra.Command{
 			return
 		}
 
-		nc.Publish(topic, []byte(message))
-		nc.Flush()
-		if nc.LastError() != nil {
+		err = nc.Publish(topic, message)
+		if err != nil {
 			log.Printf("Failed to publish to: %s\n", topic)
-			return
 		}
 
 		log.Printf("Published a message to topic: %s\n", topic)
-		log.Printf("Message: %s\n", message)
+		log.Printf("Message: %s\n", string(message))
+
+		err = nc.Flush()
+		if err != nil {
+			log.Printf("Failed to flush nats connection")
+			return
+		}
 	},
 }
 
