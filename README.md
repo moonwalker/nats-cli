@@ -1,3 +1,7 @@
+# DEPRECATED
+
+**Archiving this repository in favour of https://github.com/nats-io/natscli**
+
 # nats-cli
 
 simple cli for nats pub/sub
